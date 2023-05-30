@@ -1,0 +1,35 @@
+name: Publish
+
+on:
+    release:
+        types:
+            - created
+
+jobs:
+    deploy:
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v3
+            - name: Set up Python
+              uses: actions/setup-python@v3
+              with:
+                  python-version: "3.10"
+            - name: Install Poetry
+              uses: snok/install-poetry@v1
+              with:
+                  version: 1.5.1
+                  virtualenvs-create: true
+                  virtualenvs-in-project: true
+            - name: Install dependencies
+              run: |
+                  poetry install
+            - name: Set up Poetry
+              run: |
+                  poetry config pypi-token.pypi ${{ secrets.PYPI_API_TOKEN }}
+            - name: Build
+              run: |
+                  poetry build
+            - name: Publish package
+              run: |
+                  poetry publish
